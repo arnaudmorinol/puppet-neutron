@@ -26,8 +26,9 @@ describe 'neutron::services::fwaas' do
   end
 
   let :default_params do
-    { :driver   => 'neutron.services.firewall.drivers.linux.iptables_fwaas.IptablesFwaasDriver',
-      :enabled  => true }
+    { :driver               => 'neutron.services.firewall.drivers.linux.iptables_fwaas.IptablesFwaasDriver',
+      :enabled              => true,
+      :vpnaas_agent_package => false }
   end
 
   shared_examples_for 'neutron fwaas service plugin' do
@@ -49,7 +50,26 @@ describe 'neutron::services::fwaas' do
     end
 
     let :platform_params do
-      { :l3_agent_package => 'neutron-l3-agent' }
+      { :l3_agent_package     => 'neutron-l3-agent',
+        :vpnaas_agent_package => 'neutron-vpn-agent' }
+    end
+
+    it_configures 'neutron fwaas service plugin'
+
+  end
+  
+  context 'on Debian platforms with VPNaaS' do
+    let :facts do
+      { :osfamily => 'Debian' }
+    end
+
+    let :platform_params do
+      { :l3_agent_package     => 'neutron-l3-agent',
+        :vpnaas_agent_package => 'neutron-vpn-agent' }
+    end
+    
+    let :params do
+      { :vpnaas_agent_package => true }
     end
 
     it_configures 'neutron fwaas service plugin'
